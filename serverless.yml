@@ -1,0 +1,92 @@
+org: gianquintana
+app: sls-sandbox
+service: sandbox-api
+
+frameworkVersion: '2'
+
+custom:
+  table:
+    users: sandboxUsers
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 512m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    seed:
+      domain:
+        sources:
+          - table: ${self:custom.table.users}
+            sources: [ ./seed/userSeed.json ]
+  prune:
+    automatic: true
+    number: 3
+
+resources:
+  Resources:
+    sandboxUsers:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.table.users}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 5
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: ap-southeast-1
+  profile: default
+  lambdaHashingVersion: '20201221'
+  httpApi:
+    cors: true
+  environment:
+    USERS_TABLE: ${self:custom.table.users}
+    FIREBASE_APP_ID: ${param:FIREBASE_APP_ID}
+    FIREBASE_DATABASE_URL: ${param:FIREBASE_DATABASE_URL}
+    FIREBASE_AUTH_DOMAIN: ${param:FIREBASE_AUTH_DOMAIN}
+    FIREBASE_MESSAGING_ID: ${param:FIREBASE_MESSAGING_ID}
+    FIREBASE_STORAGE_BUCKET: ${param:FIREBASE_STORAGE_BUCKET}
+    FIREBASE_PROJECT_ID: ${param:FIREBASE_PROJECT_ID}
+    FIREBASE_MEASUREMENT_ID: ${param:FIREBASE_MEASUREMENT_ID}
+    FIREBASE_API_KEY: ${param:FIREBASE_API_KEY}
+
+functions:
+  test:
+    handler: src/handler/test-handler.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /success
+      - httpApi:
+          method: GET
+          path: /error
+  firebase:
+    handler: src/handler/firebase-handler.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/verify
+
+package:
+  patterns:
+    - ".idea/**"
+    - ".eslintrc.json"
+    - "README.md"
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+  - serverless-prune-plugin

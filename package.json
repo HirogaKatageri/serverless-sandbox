@@ -1,0 +1,32 @@
+{
+  "name": "sls-sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.29.0",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "connect-timeout": "^1.9.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-partial-response": "^1.0.4",
+    "firebase-admin": "^9.11.1",
+    "joi": "^17.4.2",
+    "morgan": "^1.10.0",
+    "response-time": "^2.3.2",
+    "serverless-http": "^2.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "prettier": "^2.3.2",
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline": "^8.0.0",
+    "serverless-prune-plugin": "^1.5.1"
+  },
+  "scripts": {
+    "run:sls:dev": "sls offline"
+  }
+}
